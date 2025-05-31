@@ -1,0 +1,48 @@
+name: C++ Skip List CI
+
+on:
+  push:
+    branches:
+      - main 
+      - 'feat/**'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-22.04 
+
+    steps:
+    - name: Checkout code 
+      uses: actions/checkout@v4
+
+    - name: Install build dependencies 
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y build-essential
+
+    - name: Build and Install Google Test (with Make)
+      run: |
+        git clone https://github.com/google/googletest.git /tmp/googletest
+        cd /tmp/googletest/googletest # Переходим в поддиректорию googletest
+        
+        make -j$(nproc)
+        
+        sudo cp libgtest.a /usr/local/lib/
+        sudo cp libgtest_main.a /usr/local/lib/
+        sudo mkdir -p /usr/local/include/gtest
+        sudo cp -r include/* /usr/local/include/gtest/
+        
+        cd ../googlemock 
+        make -j$(nproc)
+        sudo cp libgmock.a /usr/local/lib/
+        sudo cp libgmock_main.a /usr/local/lib/
+        sudo mkdir -p /usr/local/include/gmock
+        sudo cp -r include/* /usr/local/include/gmock/
+
+    - name: Build project 
+      run: make all 
+
+    - name: Run tests
+      run: make test 
