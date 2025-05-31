@@ -7,13 +7,19 @@ CXXFLAGS = -std=c++20 -Wall -Wextra -pedantic -Iinclude -I$(GTEST_INC_DIR)
 LDFLAGS = -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread 
 TARGET = test_skip_list
 
+SRC_DIR = src
+TEST_SRC_DIR = test
+
+TEST_SOURCES = $(wildcard $(TEST_SRC_DIR)/*.cpp)
+TEST_OBJECTS = $(patsubst %.cpp,%.o,$(TEST_SOURCES))
+
 all: $(TARGET)
 
-$(TARGET): test/skip_list_test.cpp include/skip_list.h
-	$(CXX) $(CXXFLAGS) -o $@ $< $(LDFLAGS) 
+$(TARGET): $(TEST_OBJECTS) 
+	$(CXX) $(LDFLAGS) $^ -o $@
 
 test: $(TARGET)
 	./$(TARGET)
 
 clean:
-	rm -f $(TARGET)
+	rm -f $(TARGET) $(TEST_OBJECTS) 
