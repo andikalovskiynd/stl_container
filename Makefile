@@ -4,7 +4,8 @@ GTEST_LIB_DIR ?= /usr/local/lib
 
 CXX = g++
 CXXFLAGS = -std=c++20 -Wall -Wextra -pedantic -Iinclude -I$(GTEST_INC_DIR)
-LDFLAGS = -L$(GTEST_LIB_DIR) -lgtest -lgtest_main -pthread 
+LDFLAGS = -L$(GTEST_LIB_DIR) -lgtest_main -lgtest -pthread
+
 TARGET = test_skip_list
 
 SRC_DIR = src
