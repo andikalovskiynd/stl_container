@@ -24,6 +24,9 @@ class SkipList
 
     public:
         // ==============================
+
+        class const_iterator;
+
         class iterator
         {
             private:
@@ -36,10 +39,12 @@ class SkipList
                 using pointer = T*;
                 using reference = T&;
 
+                friend class const_iterator;
+
                 explicit iterator(Node<T>* node_ptr = nullptr) : current_node(node_ptr) {}
 
                 // Dereferncing operator overload 
-                reference operator*()
+                reference operator*() const
                 {
                     if (!current_node)
                     {
@@ -78,10 +83,15 @@ class SkipList
 
                 bool operator==(const iterator& other) const { return current_node == other.current_node; }
                 bool operator!=(const iterator& other) const { return current_node != other.current_node; }
+
+                // Comparing iterator with const_iterator
+                bool operator==(const const_iterator& other) const { return current_node == other.current_node; }
+                bool operator!=(const const_iterator& other) const { return current_node != other.current_node; }
         };
 
         class const_iterator 
         {
+            friend class iterator;
             private:
                 const Node<T>* current_node;
             
@@ -95,7 +105,7 @@ class SkipList
                 explicit const_iterator(const Node<T>* node_ptr) : current_node(node_ptr) {}
                 
                 // transition constructor
-                const_iterator(const iterator& other) : current_node(other.current_node) {}
+                const_iterator(const typename SkipList<T>::iterator& other) : current_node(other.current_node) {}
 
                 // Dereferncing operator overload 
                 reference operator*()
@@ -130,13 +140,17 @@ class SkipList
                 // Postfix increment
                 const_iterator operator++(int)
                 {
-                    iterator temp = *this;
+                    const_iterator temp = *this;
                     ++(*this);
                     return temp;
                 }
 
                 bool operator==(const const_iterator& other) const { return current_node == other.current_node; }
                 bool operator!=(const const_iterator& other) const { return current_node != other.current_node; }
+
+                // Comparing const_iterator with iterator:
+                bool operator==(const iterator& other) const { return current_node == other.current_node; }
+                bool operator!=(const iterator& other) const { return current_node != other.current_node; }
         };
 
         iterator begin()
@@ -226,6 +240,7 @@ std::size_t SkipList<T>::get_random_level()
     return level;
     */
 
+    // fixed for testing
     static std::mt19937 fixed_gen(0); 
     std::uniform_int_distribution<> distrib(0, MAX_LEVEL);
     std::size_t level = 0;
