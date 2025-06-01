@@ -81,3 +81,28 @@ TEST_F(SkipListIntTest, Insert_DublicateElement)
     EXPECT_EQ(2, int_list.size());
     EXPECT_TRUE(check_level_0({10, 20}));
 }
+
+// CONTAINS TEST
+TEST_F(SkipListIntTest, Contains_EmptyList) 
+{
+    EXPECT_FALSE(int_list.contains(10));
+}
+
+TEST_F(SkipListIntTest, Contains_FewExisting)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    EXPECT_TRUE(int_list.contains(10));
+    EXPECT_TRUE(int_list.contains(20));
+}
+
+TEST_F(SkipListIntTest, Contains_FewNotExisting)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    EXPECT_FALSE(int_list.contains(9));
+    EXPECT_FALSE(int_list.contains(11));
+}
+

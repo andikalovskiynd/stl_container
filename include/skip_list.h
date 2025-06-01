@@ -4,6 +4,7 @@
 #include <vector>
 #include <memory>
 #include <random>
+#include <iostream>
 
 #include "node.h"
 
@@ -25,8 +26,6 @@ class SkipList
         SkipList();
         ~SkipList() = default;
 
-        void doNothing(const T& value);
-
         // Init checking
         std::size_t get_current_level() const;
         std::size_t size() const;
@@ -36,6 +35,8 @@ class SkipList
 
         // Main functionality
         void insert(const T& value);
+        bool contains(const T& value) const;
+        bool erase(const T& value);
 };
 
 template <typename T>
@@ -73,12 +74,16 @@ std::size_t SkipList<T>::get_random_level()
         ++level;
     }
     return level;
-}
 
-template <typename T>
-void SkipList<T>::doNothing(const T& value)
-{
-    (void)value;
+    /*
+    static std::mt19937 fixed_gen(0); 
+    std::uniform_int_distribution<> distrib(0, MAX_LEVEL);
+    std::size_t level = 0;
+    while (distrib(fixed_gen) % 2 == 0 && level < MAX_LEVEL) {
+        level++;
+    }
+    return level;
+    */
 }
 
 template <typename T>
@@ -102,15 +107,14 @@ std::shared_ptr<Node<T>> SkipList<T>::get_first_node_at_0() const
 template <typename T>
 void SkipList<T>::insert(const T& value)
 {
-    // update array which contains nods pointers 
+    // Array for predecessors at every level which pointers we have to update
     std::vector<Node<T>*> update(MAX_LEVEL + 1, nullptr);
 
     // current MUST be raw pointer to avoid affect on logic of shared ptrs 
     Node<T>* current = head.get();
 
-    // Step 1
-    // going from top to bottom. for every level we search the rightest current node which value is lower than 'value' 
-    for (std::size_t i = current_level; i>= 1; --i)
+    // Step 1 and 2 
+    for (std::size_t i = current_level + 1; i-- > 0;) // Идем от current_level до 0 включительно
     {
         while (current->next[i] != nullptr && current->next[i]->getValue() < value)
         {
@@ -118,14 +122,6 @@ void SkipList<T>::insert(const T& value)
         }
         update[i] = current;
     }
-
-    // Step 2
-    // Finding place for element at level 0
-    while(current->next[0] != nullptr && current->next[0]->getValue() < value)
-    {
-        current = current->next[0].get();
-    }
-    update[0] = current;
 
     // checking for dublicates 
     if (current->next[0] != nullptr && current->next[0]->getValue() == value) 
@@ -151,12 +147,108 @@ void SkipList<T>::insert(const T& value)
     // Creating and inserting a node
     std::shared_ptr<Node<T>> new_node = std::make_shared<Node<T>>(value, new_node_level);
 
-    for (std::size_t i = 0; i < new_node_level; ++i)
+    for (std::size_t i = 0; i <= new_node_level; ++i)
     {
         new_node->next[i] = update[i]->next[i];
         update[i]->next[i] = new_node; 
     }
 
     num_elements++;
+
+    // DEBUG
+    /*
+    std::cout << "DEBUG: Inserted value: " << value << ". Current list on level 0: ";
+    std::shared_ptr<Node<T>> debug_current = head->next[0];
+    while (debug_current != nullptr) 
+    {
+        std::cout << debug_current->getValue() << " ";
+        debug_current = debug_current->next[0];
+    }
+    std::cout << std::endl;
+    std::cout << "DEBUG: current_level after insert: " << current_level << std::endl;
+    */
 }
+
+template <typename T>
+bool SkipList<T>::contains(const T& value) const
+{
+    // std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
+
+    Node<T>* current = head.get();
+
+    for (std::size_t i = current_level; i >=1; --i)
+    {
+        // std::cout << "DEBUG: contains: Level " << i << ", current value: " << current->getValue() << std::endl;
+        while (current->next[i] != nullptr && current->next[i]->getValue() < value)
+        {
+            current = current->next[i].get();
+        }
+    }
+
+    // std::cout << "DEBUG: contains: After loop, current value: " << current->getValue() << std::endl;
+    // std::cout << "DEBUG: contains: Checking head->next[0] value: " << (current->next[0] ? std::to_string(current->next[0]->getValue()) : "nullptr") << std::endl;
+
+    if (current->next[0] != nullptr && current->next[0]->getValue() == value)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+template <typename T>
+bool SkipList<T>::erase(const T& value)
+{
+    // Logic is similar for insert() at the beginning
+    std::vector<Node<T>*> update(MAX_LEVEL + 1);
+
+    Node<T>* current = head.get();
+
+    for (std::size_t i = current_level; i>= 1; --i)
+    {
+        while (current->next[i] != nullptr && current->next[i]->getValue() < value)
+        {
+            current = current->next[i].get();
+        }
+        update[i] = current;
+    }
+
+    while(current->next[0] != nullptr && current->next[0]->getValue() < value)
+    {
+        current = current->next[0].get();
+    }
+    update[0] = current;
+
+    // Here we go other way
+    std::shared_ptr<Node<T>> node_to_delete = current->next[0];
+
+    if (node_to_delete != nullptr && node_to_delete->getValue() == value) 
+    {
+        // Element is found. Now delete it and update pointers. 
+        for (std::size_t i = 0; i <= node_to_delete->level; ++i) 
+        {
+            // If predecessor on its level points on deleting node, we make it go next node after deleting one.
+            if (update[i]->next[i] != nullptr && update[i]->next[i]->getValue() == value) 
+            {
+                update[i]->next[i] = node_to_delete->next[i];
+            }
+        }
+
+        num_elements--;
+
+        // Update current level 
+        while (current_level > 0 && head->next[current_level] == nullptr) 
+        {
+            current_level--;
+        }
+        return true;
+    }
+
+    return false;
+}
+
+
+
+
+
 #endif

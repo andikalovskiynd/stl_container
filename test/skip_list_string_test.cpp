@@ -82,3 +82,27 @@ TEST_F(SkipListStringTest, Insert_DublicateElement)
     EXPECT_EQ(2, string_list.size());
     EXPECT_TRUE(check_level_0({"Apple", "Banana"}));
 }
+
+// CONTAINS TEST
+TEST_F(SkipListStringTest, Contains_EmptyList) 
+{
+    EXPECT_FALSE(string_list.contains("Apple"));
+}
+
+TEST_F(SkipListStringTest, Contains_FewExisting)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    EXPECT_TRUE(string_list.contains("Apple"));
+    EXPECT_TRUE(string_list.contains("Banana"));
+}
+
+TEST_F(SkipListStringTest, Contains_FewNotExisting)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    EXPECT_FALSE(string_list.contains("Cherry"));
+    EXPECT_FALSE(string_list.contains("Dragonfruit"));
+}

@@ -80,3 +80,27 @@ TEST_F(SkipListDoubleTest, Insert_DublicateElement)
     EXPECT_EQ(2, double_list.size());
     EXPECT_TRUE(check_level_0({10.75892, 20.5656}));
 }
+
+// CONTAINS TEST
+TEST_F(SkipListDoubleTest, Contains_EmptyList) 
+{
+    EXPECT_FALSE(double_list.contains(10.4321));
+}
+
+TEST_F(SkipListDoubleTest, Contains_FewExisting)
+{
+    double_list.insert(10.555);
+    double_list.insert(20.121);
+
+    EXPECT_TRUE(double_list.contains(10.555));
+    EXPECT_TRUE(double_list.contains(20.121));
+}
+
+TEST_F(SkipListDoubleTest, Contains_FewNotExisting)
+{
+    double_list.insert(10.443);
+    double_list.insert(20.443);
+
+    EXPECT_FALSE(double_list.contains(10.444));
+    EXPECT_FALSE(double_list.contains(20.444));
+}
