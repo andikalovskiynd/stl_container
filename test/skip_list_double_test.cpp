@@ -32,6 +32,7 @@ TEST_F(SkipListDoubleTest, Insert_SingleElement)
 {
     double_list.insert(10.75892);
 
+    ASSERT_TRUE(double_list.contains(10.75892));
     EXPECT_EQ(1, double_list.size());
     EXPECT_TRUE(check_level_0({10.75892}));
 }
@@ -42,6 +43,10 @@ TEST_F(SkipListDoubleTest, Insert_MultipleElements_Ascending)
     double_list.insert(20.4432);
     double_list.insert(20.5566);
 
+    ASSERT_TRUE(double_list.contains(10.75892));
+    ASSERT_TRUE(double_list.contains(20.4432));
+    ASSERT_TRUE(double_list.contains(20.5566));
+
     EXPECT_EQ(3, double_list.size());
     EXPECT_TRUE(check_level_0({10.75892, 20.4432, 20.5566}));
 }
@@ -51,6 +56,10 @@ TEST_F(SkipListDoubleTest, Insert_MultipleElements_Descdending)
     double_list.insert(20.5566);
     double_list.insert(20.4432);
     double_list.insert(10.75892);
+
+    ASSERT_TRUE(double_list.contains(10.75892));
+    ASSERT_TRUE(double_list.contains(20.4432));
+    ASSERT_TRUE(double_list.contains(20.5566));
 
     EXPECT_EQ(3, double_list.size());
     EXPECT_TRUE(check_level_0({10.75892, 20.4432, 20.5566}));
@@ -65,6 +74,13 @@ TEST_F(SkipListDoubleTest, Insert_MultipleElements_Randomly)
     double_list.insert(110.75892);
     double_list.insert(79.6667);
 
+    ASSERT_TRUE(double_list.contains(13.674554));
+    ASSERT_TRUE(double_list.contains(5.55543));
+    ASSERT_TRUE(double_list.contains(1.0001));
+    ASSERT_TRUE(double_list.contains(22.4432));
+    ASSERT_TRUE(double_list.contains(110.75892));
+    ASSERT_TRUE(double_list.contains(79.6667));
+
     EXPECT_EQ(6, double_list.size());
     EXPECT_TRUE(check_level_0({1.0001, 5.55543, 13.674554, 22.4432, 79.6667, 110.75892}));
 }
@@ -73,6 +89,9 @@ TEST_F(SkipListDoubleTest, Insert_DublicateElement)
 {
     double_list.insert(10.75892);
     double_list.insert(20.5656);
+
+    ASSERT_TRUE(double_list.contains(10.75892));
+    ASSERT_TRUE(double_list.contains(20.5656));
 
     EXPECT_EQ(2, double_list.size());
 

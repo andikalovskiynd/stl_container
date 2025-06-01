@@ -34,6 +34,7 @@ TEST_F(SkipListStringTest, Insert_SingleElement)
 {
     string_list.insert("Word");
 
+    ASSERT_TRUE(string_list.contains("Word"));
     EXPECT_EQ(1, string_list.size());
     EXPECT_TRUE(check_level_0({"Word"}));
 }
@@ -44,6 +45,10 @@ TEST_F(SkipListStringTest, Insert_MultipleElements_Ascending)
     string_list.insert("Banana");
     string_list.insert("Cherry");
 
+    ASSERT_TRUE(string_list.contains("Apple"));
+    ASSERT_TRUE(string_list.contains("Banana"));
+    ASSERT_TRUE(string_list.contains("Cherry"));
+
     EXPECT_EQ(3, string_list.size());
     EXPECT_TRUE(check_level_0({"Apple", "Banana", "Cherry"}));
 }
@@ -53,6 +58,10 @@ TEST_F(SkipListStringTest, Insert_MultipleElements_Descdending)
     string_list.insert("Cherry");
     string_list.insert("Banana");
     string_list.insert("Apple");
+
+    ASSERT_TRUE(string_list.contains("Apple"));
+    ASSERT_TRUE(string_list.contains("Banana"));
+    ASSERT_TRUE(string_list.contains("Cherry"));
 
     EXPECT_EQ(3, string_list.size());
     EXPECT_TRUE(check_level_0({"Apple", "Banana", "Cherry"}));
@@ -67,6 +76,13 @@ TEST_F(SkipListStringTest, Insert_MultipleElements_Randomly)
     string_list.insert("Helicopter");
     string_list.insert("Witch");
 
+    ASSERT_TRUE(string_list.contains("Apple"));
+    ASSERT_TRUE(string_list.contains("Banana"));
+    ASSERT_TRUE(string_list.contains("Cherry"));
+    ASSERT_TRUE(string_list.contains("Demon"));
+    ASSERT_TRUE(string_list.contains("Helicopter"));
+    ASSERT_TRUE(string_list.contains("Witch"));
+
     EXPECT_EQ(6, string_list.size());
     EXPECT_TRUE(check_level_0({"Apple", "Banana", "Cherry", "Demon", "Helicopter", "Witch"}));
 }
@@ -75,6 +91,9 @@ TEST_F(SkipListStringTest, Insert_DublicateElement)
 {
     string_list.insert("Apple");
     string_list.insert("Banana");
+
+    ASSERT_TRUE(string_list.contains("Apple"));
+    ASSERT_TRUE(string_list.contains("Banana"));
 
     EXPECT_EQ(2, string_list.size());
 

@@ -67,15 +67,16 @@ SkipList<T>::~SkipList()
 
 template <typename T>
 std::size_t SkipList<T>::get_random_level()
-{
+{   
+    /*
     std::size_t level = 1;
     while (dis(rng) < 0.25 && level < MAX_LEVEL)
     {
         ++level;
     }
     return level;
+    */
 
-    /*
     static std::mt19937 fixed_gen(0); 
     std::uniform_int_distribution<> distrib(0, MAX_LEVEL);
     std::size_t level = 0;
@@ -83,7 +84,6 @@ std::size_t SkipList<T>::get_random_level()
         level++;
     }
     return level;
-    */
 }
 
 template <typename T>
@@ -156,7 +156,6 @@ void SkipList<T>::insert(const T& value)
     num_elements++;
 
     // DEBUG
-    /*
     std::cout << "DEBUG: Inserted value: " << value << ". Current list on level 0: ";
     std::shared_ptr<Node<T>> debug_current = head->next[0];
     while (debug_current != nullptr) 
@@ -166,34 +165,46 @@ void SkipList<T>::insert(const T& value)
     }
     std::cout << std::endl;
     std::cout << "DEBUG: current_level after insert: " << current_level << std::endl;
-    */
 }
 
 template <typename T>
 bool SkipList<T>::contains(const T& value) const
 {
-    // std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
+    std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
 
     Node<T>* current = head.get();
 
-    for (std::size_t i = current_level; i >=1; --i)
+    for (std::size_t level = current_level + 1; level-- > 0;)
     {
-        // std::cout << "DEBUG: contains: Level " << i << ", current value: " << current->getValue() << std::endl;
-        while (current->next[i] != nullptr && current->next[i]->getValue() < value)
+        while (current->next[level] != nullptr && current->next[level]->getValue() < value)
         {
-            current = current->next[i].get();
+            current = current->next[level].get();
         }
     }
 
-    // std::cout << "DEBUG: contains: After loop, current value: " << current->getValue() << std::endl;
-    // std::cout << "DEBUG: contains: Checking head->next[0] value: " << (current->next[0] ? std::to_string(current->next[0]->getValue()) : "nullptr") << std::endl;
+    bool found = (current->next[0] != nullptr && current->next[0]->getValue() == value);
 
-    if (current->next[0] != nullptr && current->next[0]->getValue() == value)
+    if (found)
     {
-        return true;
+        std::cout << "DEBUG: contains: found value" << current->next[0]->getValue() << std::endl;
     }
 
-    return false;
+    else 
+    {
+        std::cout << "DEBUG: contains: Value " << value << " not found." << std::endl;
+
+        if (current != head.get()) 
+        {
+            std::cout << "DEBUG: contains: After loop, current value: " << current->getValue() << std::endl;
+        } 
+
+        else 
+        {
+            std::cout << "DEBUG: contains: After loop, current value: [HEAD_NODE]" << std::endl;
+        }
+    }
+
+    return found;
 }
 
 template <typename T>
@@ -225,10 +236,9 @@ bool SkipList<T>::erase(const T& value)
     if (node_to_delete != nullptr && node_to_delete->getValue() == value) 
     {
         // Element is found. Now delete it and update pointers. 
-        for (std::size_t i = 0; i <= node_to_delete->level; ++i) 
+        for (std::size_t i = 0; i <= node_to_delete->level; ++i)
         {
-            // If predecessor on its level points on deleting node, we make it go next node after deleting one.
-            if (update[i]->next[i] != nullptr && update[i]->next[i]->getValue() == value) 
+            if (update[i]->next[i] == node_to_delete) 
             {
                 update[i]->next[i] = node_to_delete->next[i];
             }
