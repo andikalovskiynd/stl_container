@@ -12,7 +12,9 @@ private:
     T value;
 
 public:
+    std::size_t level;
     std::vector<std::shared_ptr<Node<T>>> next;
+
 
     Node(const T& val, std::size_t level);
             
@@ -26,10 +28,10 @@ public:
 };
 
 template <typename T>
-Node<T>::Node(const T& val, std::size_t level) : value(val), next(level, nullptr) {}
+Node<T>::Node(const T& val, std::size_t lvl) : value(val), level(lvl), next(level + 1, nullptr) {}
 
 template <typename T> 
-Node<T>::Node(std::size_t _level) : next(_level, nullptr) {};
+Node<T>::Node(std::size_t _lvl) : level(_lvl), next(_lvl + 1, nullptr) {};
 
 template <typename T>
 T Node<T>::getValue()
