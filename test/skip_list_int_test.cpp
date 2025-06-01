@@ -160,4 +160,3 @@ TEST_F(SkipListIntTest, Erase_EmptyList)
     EXPECT_TRUE(check_level_0({}));
     EXPECT_EQ(0, int_list.size());
 }
-

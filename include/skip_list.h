@@ -23,12 +23,161 @@ class SkipList
         std::size_t get_random_level();
 
     public:
+        // ==============================
+        class iterator
+        {
+            private:
+                Node<T>* current_node;
+
+            public: 
+                using iterator_category = std::forward_iterator_tag; // SkipList only goes forward
+                using value_type = T;
+                using difference_type = std::ptrdiff_t;
+                using pointer = T*;
+                using reference = T&;
+
+                explicit iterator(Node<T>* node_ptr = nullptr) : current_node(node_ptr) {}
+
+                // Dereferncing operator overload 
+                reference operator*()
+                {
+                    if (!current_node)
+                    {
+                        throw std::out_of_range("Dereferencing null iterator.");
+                    }
+                    return current_node->getValue();
+                }
+
+                // Pointer operator overload
+                pointer operator->() const 
+                {
+                    if (!current_node)
+                    {
+                        throw std::out_of_range("Dereferencing null iterator.");
+                    }
+                    return &(current_node->getValue());
+                }
+
+                // Prefix increment 
+                iterator& operator++()
+                {
+                    if (current_node)
+                    {
+                        current_node = current_node->next[0].get();
+                    }
+                    return *this;
+                }
+
+                // Postfix increment
+                iterator operator++(int)
+                {
+                    iterator temp = *this;
+                    ++(*this);
+                    return temp;
+                }
+
+                bool operator==(const iterator& other) const { return current_node == other.current_node; }
+                bool operator!=(const iterator& other) const { return current_node != other.current_node; }
+        };
+
+        class const_iterator 
+        {
+            private:
+                const Node<T>* current_node;
+            
+            public:
+                using iterator_category = std::forward_iterator_tag;
+                using value_type = T;
+                using difference_type = std::ptrdiff_t;
+                using pointer = const T*; 
+                using reference = const T&;
+
+                explicit const_iterator(const Node<T>* node_ptr) : current_node(node_ptr) {}
+                
+                // transition constructor
+                const_iterator(const iterator& other) : current_node(other.current_node) {}
+
+                // Dereferncing operator overload 
+                reference operator*()
+                {
+                    if (!current_node)
+                    {
+                        throw std::out_of_range("Dereferencing null iterator.");
+                    }
+                    return current_node->getValue();
+                }
+
+                // Pointer operator overload
+                pointer operator->() const 
+                {
+                    if (!current_node)
+                    {
+                        throw std::out_of_range("Dereferencing null iterator.");
+                    }
+                    return &(current_node->getValue());
+                }
+
+                // Prefix increment 
+                const_iterator& operator++() 
+                {
+                    if (current_node) 
+                    {
+                        current_node = current_node->next[0].get();
+                    }
+                    return *this; 
+                }
+
+                // Postfix increment
+                const_iterator operator++(int)
+                {
+                    iterator temp = *this;
+                    ++(*this);
+                    return temp;
+                }
+
+                bool operator==(const const_iterator& other) const { return current_node == other.current_node; }
+                bool operator!=(const const_iterator& other) const { return current_node != other.current_node; }
+        };
+
+        iterator begin()
+        {
+            return iterator(head->next[0].get());
+        }
+
+        const_iterator begin() const
+        {
+            return const_iterator(head->next[0].get());
+        }
+
+        iterator end()
+        {
+            return iterator(nullptr);
+        }
+
+        const_iterator end() const
+        {
+            return const_iterator(nullptr);
+        }
+
+        const_iterator cbegin() const
+        {
+            return const_iterator(head->next[0].get());
+        }
+
+        const_iterator cend() const
+        {
+            return const_iterator(nullptr);
+        }
+
+        // ======================
+
         SkipList();
         ~SkipList() = default;
 
         // Init checking
         std::size_t get_current_level() const;
         std::size_t size() const;
+        bool empty() const;
 
         // Test requirements
         std::shared_ptr<Node<T>> get_first_node_at_0() const;
@@ -156,6 +305,7 @@ void SkipList<T>::insert(const T& value)
     num_elements++;
 
     // DEBUG
+    /*
     std::cout << "DEBUG: Inserted value: " << value << ". Current list on level 0: ";
     std::shared_ptr<Node<T>> debug_current = head->next[0];
     while (debug_current != nullptr) 
@@ -165,12 +315,13 @@ void SkipList<T>::insert(const T& value)
     }
     std::cout << std::endl;
     std::cout << "DEBUG: current_level after insert: " << current_level << std::endl;
+    */
 }
 
 template <typename T>
 bool SkipList<T>::contains(const T& value) const
 {
-    std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
+    // std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
 
     Node<T>* current = head.get();
 
@@ -184,6 +335,7 @@ bool SkipList<T>::contains(const T& value) const
 
     bool found = (current->next[0] != nullptr && current->next[0]->getValue() == value);
 
+    /*
     if (found)
     {
         std::cout << "DEBUG: contains: found value" << current->next[0]->getValue() << std::endl;
@@ -203,6 +355,7 @@ bool SkipList<T>::contains(const T& value) const
             std::cout << "DEBUG: contains: After loop, current value: [HEAD_NODE]" << std::endl;
         }
     }
+    */
 
     return found;
 }
@@ -257,8 +410,11 @@ bool SkipList<T>::erase(const T& value)
     return false;
 }
 
-
-
+template <typename T>
+bool SkipList<T>::empty() const
+{
+    return num_elements == 0;
+}
 
 
 #endif
