@@ -125,3 +125,131 @@ TEST_F(SkipListStringTest, Contains_FewNotExisting)
     EXPECT_FALSE(string_list.contains("Cherry"));
     EXPECT_FALSE(string_list.contains("Dragonfruit"));
 }
+
+// Lexicographic operators
+TEST_F(SkipListStringTest, Operator_LessThan_EmptyVsNotEmpty)
+{
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    EXPECT_TRUE(string_list < other_list);
+    EXPECT_FALSE(other_list < string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_LessThan_TwoDifferent)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+    other_list.insert("Cherry");
+
+    EXPECT_TRUE(string_list < other_list);
+    EXPECT_FALSE(other_list < string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_LessThan_LessVsGreater)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+    string_list.insert("Cherry");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+    other_list.insert("Berry"); 
+
+    EXPECT_TRUE(other_list < string_list);
+    EXPECT_FALSE(string_list < other_list);
+}
+
+// >
+TEST_F(SkipListStringTest, Operator_GreaterThan_EmptyVsNotEmpty)
+{
+    SkipList<std::string> other_list;
+    string_list.insert("Apple");
+    EXPECT_TRUE(string_list > other_list);
+    EXPECT_FALSE(other_list > string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_GreaterThan_TwoDifferent)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+    string_list.insert("Cherry");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+
+    EXPECT_TRUE(string_list > other_list);
+    EXPECT_FALSE(other_list > string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_GreaterThan_LessVsGreater)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+    string_list.insert("Cherry");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+    other_list.insert("Berry");
+
+    EXPECT_TRUE(string_list > other_list);
+    EXPECT_FALSE(other_list > string_list);
+}
+
+// <=
+TEST_F(SkipListStringTest, Operator_LessOrEqual_Identical)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    SkipList<std::string> other_list(string_list); 
+
+    EXPECT_TRUE(string_list <= other_list);
+    EXPECT_TRUE(other_list <= string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_LessOrEqual_LessVsGreater)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+    other_list.insert("Cherry");
+
+    EXPECT_TRUE(string_list <= other_list);
+    EXPECT_FALSE(other_list <= string_list);
+}
+
+// >=
+TEST_F(SkipListStringTest, Operator_GreaterOrEqual_Identical)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+
+    SkipList<std::string> other_list(string_list);
+
+    EXPECT_TRUE(string_list >= other_list);
+    EXPECT_TRUE(other_list >= string_list);
+}
+
+TEST_F(SkipListStringTest, Operator_GreaterOrEqual_LessVsGreater)
+{
+    string_list.insert("Apple");
+    string_list.insert("Banana");
+    string_list.insert("Cherry");
+
+    SkipList<std::string> other_list;
+    other_list.insert("Apple");
+    other_list.insert("Banana");
+    
+    EXPECT_TRUE(string_list >= other_list);
+    EXPECT_FALSE(other_list >= string_list);
+}

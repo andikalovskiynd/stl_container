@@ -24,7 +24,8 @@ public:
     ~Node() = default;
 
     // 
-    T getValue();
+    T& getValue();
+    const T& getValue() const;
 };
 
 template <typename T>
@@ -34,7 +35,13 @@ template <typename T>
 Node<T>::Node(std::size_t _lvl) : level(_lvl), next(_lvl + 1, nullptr) {};
 
 template <typename T>
-T Node<T>::getValue()
+T& Node<T>::getValue() 
+{
+    return value;
+}
+
+template <typename T>
+const T& Node<T>::getValue() const
 {
     return value;
 }
