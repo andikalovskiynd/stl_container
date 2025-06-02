@@ -1,3 +1,8 @@
+/**
+ * @file skip_list.h 
+ * @brief SkipList definition and implementation.
+*/
+
 #ifndef SKIP_LIST_H
 #define SKIP_LIST_H
 
@@ -8,42 +13,71 @@
 
 #include "node.h"
 
+/**
+ * @brief A templated SkipList data structure for storing elements in sorted order.
+ * @tparam T The type of elements to be stored in the SkipList.
+ * @details Requires operator< and operator== to be defined for type T.
+ */
 template <typename T>
 class SkipList 
 {
     private:
+        /// @brief Maximum number of levels in the SkipList.
         static const std::size_t MAX_LEVEL = 16; 
+
+        /// @brief Head node of the SkipList. Does not keep any value.
         std::unique_ptr<Node<T>> head;
 
+        /// @brief Current maximum level reached by any node.
         std::size_t current_level;
+
+        /// @brief Number of elements in list.
         std::size_t num_elements;
 
+        /// @brief Random number generator.
         std::mt19937 rng;
+
+        /// @brief Distribution for level generation probability.
         std::uniform_real_distribution<> dis;
-        std::size_t get_random_level();
 
     public:
-        // ==============================
+        // ============================== //
+        // Iterator classes               //
+        // ============================== //
 
+        // Forward declaration of const_iterator to allow friend declarations.
         class const_iterator;
 
+        /// @brief Iterator class for iterating over elements in the SkipList.
         class iterator
         {
             private:
+                /// @brief Pointer to the current node in the iteration.
                 Node<T>* current_node;
 
             public: 
+                // Standard iterator traits
                 using iterator_category = std::forward_iterator_tag; // SkipList only goes forward
                 using value_type = T;
                 using difference_type = std::ptrdiff_t;
                 using pointer = T*;
                 using reference = T&;
 
+                /// @brief Allows const_iterator to access private members
                 friend class const_iterator;
 
+                /**
+                 * @brief Constructs an iterator.
+                 * @param node_ptr A pointer to the node the iterator should point to.
+                 * @details Default to 'nullptr' for an 'end()' iterator.
+                 */
                 explicit iterator(Node<T>* node_ptr = nullptr) : current_node(node_ptr) {}
 
-                // Dereferncing operator overload 
+                /**
+                 * @brief Dereferences the iterator to access the value.
+                 * @return A reference to the value of the current node.
+                 * @throw std::out_of_range If the iterator is null (for example, end() iterator).
+                 */
                 reference operator*() const
                 {
                     if (!current_node)
@@ -53,7 +87,11 @@ class SkipList
                     return current_node->getValue();
                 }
 
-                // Pointer operator overload
+                /**
+                 * @brief Provides pointer-like access to the value.
+                 * @return A pointer to the value of the current node.
+                 * @throw std::out_of_range If the iterator is null (for example, end() iterator).
+                 */
                 pointer operator->() const 
                 {
                     if (!current_node)
@@ -63,7 +101,10 @@ class SkipList
                     return &(current_node->getValue());
                 }
 
-                // Prefix increment 
+                /**
+                 * @brief Pre-increments the iterator to the next node.
+                 * @return A reference to the incremented iterator.
+                 */
                 iterator& operator++()
                 {
                     if (current_node)
@@ -73,7 +114,10 @@ class SkipList
                     return *this;
                 }
 
-                // Postfix increment
+                /**
+                 * @brief Post-increments the iterator to the next node.
+                 * @return A copy of the iterator before incrementation.
+                 */
                 iterator operator++(int)
                 {
                     iterator temp = *this;
@@ -81,34 +125,73 @@ class SkipList
                     return temp;
                 }
 
+                /**
+                 * @brief Compares two iterators for equality.
+                 * @param other The iterator to compare with.
+                 * @return True if both iterators point to the same node, false otherwise.
+                 */
                 bool operator==(const iterator& other) const { return current_node == other.current_node; }
+
+                /**
+                 * @brief Compares two iterators for inequality.
+                 * @param other The iterator to compare with.
+                 * @return True if iterators point to different nodes, false otherwise.
+                 */
                 bool operator!=(const iterator& other) const { return current_node != other.current_node; }
 
                 // Comparing iterator with const_iterator
+                /**
+                 * @brief Compares iterator and const_iterator for equality.
+                 * @details This operator is needed to compare two different iterators (const and not const).
+                 * @param other The const_iterator to compare with.
+                 * @return True if both iterators point to the same node, false otherwise.
+                 */
                 bool operator==(const const_iterator& other) const { return current_node == other.current_node; }
+
+                /**
+                 * @brief Compares iterator and const_iterator for inequality.
+                 * @details This operator is needed to compare two different iterators (const and not const).
+                 * @param other The const_iterator to compare with.
+                 * @return True if iterators point to different nodes, false otherwise.
+                 */
                 bool operator!=(const const_iterator& other) const { return current_node != other.current_node; }
         };
 
+        /// @brief Constant iterator class for iterating over elements in the SkipList.
         class const_iterator 
         {
             friend class iterator;
             private:
+                /// @brief Pointer to the current node in the iteration.
                 const Node<T>* current_node;
             
             public:
+                // Standard iterator traits
                 using iterator_category = std::forward_iterator_tag;
                 using value_type = T;
                 using difference_type = std::ptrdiff_t;
                 using pointer = const T*; 
                 using reference = const T&;
 
+                /**
+                 * @brief Constructs a const_iterator.
+                 * @param node_ptr A pointer to the node the iterator should point to.
+                 */
                 explicit const_iterator(const Node<T>* node_ptr) : current_node(node_ptr) {}
                 
-                // transition constructor
+                /**
+                 * @brief Conversion constructor from a non-const iterator to a const_iterator.
+                 * @param other The non-const iterator to convert from.
+                 * @details Used to compare two iterators with different types.
+                 */
                 const_iterator(const typename SkipList<T>::iterator& other) : current_node(other.current_node) {}
 
-                // Dereferncing operator overload 
-                reference operator*()
+                /**
+                 * @brief Dereferences the const_iterator to access the constant value.
+                 * @return A constant reference to the value of the current node.
+                 * @throw std::out_of_range If the iterator is null (for example, end() iterator).
+                 */
+                reference operator*() const
                 {
                     if (!current_node)
                     {
@@ -117,7 +200,11 @@ class SkipList
                     return current_node->getValue();
                 }
 
-                // Pointer operator overload
+                /**
+                 * @brief Provides pointer-like access to the constant value.
+                 * @return A constant pointer to the value of the current node.
+                 * @throw std::out_of_range If the iterator is null (for example, end() iterator).
+                 */
                 pointer operator->() const 
                 {
                     if (!current_node)
@@ -127,7 +214,10 @@ class SkipList
                     return &(current_node->getValue());
                 }
 
-                // Prefix increment 
+                /**
+                 * @brief Pre-increments the const_iterator to the next node.
+                 * @return A reference to the incremented const_iterator.
+                 */
                 const_iterator& operator++() 
                 {
                     if (current_node) 
@@ -137,7 +227,10 @@ class SkipList
                     return *this; 
                 }
 
-                // Postfix increment
+                /**
+                 * @brief Post-increments the const_iterator to the next node.
+                 * @return A copy of the const_iterator before incrementation.
+                 */
                 const_iterator operator++(int)
                 {
                     const_iterator temp = *this;
@@ -145,74 +238,223 @@ class SkipList
                     return temp;
                 }
 
+                /**
+                 * @brief Compares two const iterators for equality.
+                 * @param other The const iterator to compare with.
+                 * @return True if both const iterators point to the same node, false otherwise.
+                 */
                 bool operator==(const const_iterator& other) const { return current_node == other.current_node; }
+
+                /**
+                 * @brief Compares two const iterators for inequality.
+                 * @param other The const iterator to compare with.
+                 * @return True if operators point on different nodes, false otherwise.
+                 */
                 bool operator!=(const const_iterator& other) const { return current_node != other.current_node; }
 
                 // Comparing const_iterator with iterator:
+                /**
+                 * @brief Compares const_iterator and iterator for equality.
+                 * @details This operator is needed to compare two different iterators (const and not const).
+                 * @param other The iterator to compare with.
+                 * @return True if both iterators point to the same node, false otherwise.
+                 */
                 bool operator==(const iterator& other) const { return current_node == other.current_node; }
+
+                /**
+                 * @brief Compares const_iterator and iterator for inequality.
+                 * @details This operator is needed to compare two different iterators (const and not const).
+                 * @param other The iterator to compare with.
+                 * @return True if operators point on different nodes, false otherwise.
+                 */
                 bool operator!=(const iterator& other) const { return current_node != other.current_node; }
         };
 
+        /**
+         * @brief Returns an iterator to the first element of the SkipList.
+         * @return An iterator pointing to the first element.
+         */
         iterator begin()
         {
             return iterator(head->next[0].get());
         }
 
+        /**
+         * @brief Returns a const_iterator to the first element of the SkipList.
+         * @return A const_iterator pointing to the first element.
+         */
         const_iterator begin() const
         {
             return const_iterator(head->next[0].get());
         }
 
+        /**
+         * @brief Returns an iterator to the element following the last element.
+         * @return An iterator pointing past the last element.
+         */
         iterator end()
         {
             return iterator(nullptr);
         }
 
+        /**
+         * @brief Returns a const_iterator to the element following the last element.
+         * @return A const_iterator pointing past the last element.
+         */
         const_iterator end() const
         {
             return const_iterator(nullptr);
         }
 
+        /**
+         * @brief Returns a const_iterator to the first element of the SkipList (const version).
+         * @return A const_iterator pointing to the first element.
+         */
         const_iterator cbegin() const
         {
             return const_iterator(head->next[0].get());
         }
 
+        /**
+         * @brief Returns a const_iterator to the element following the last element (const version).
+         * @return A const_iterator pointing past the last element.
+         */
         const_iterator cend() const
         {
             return const_iterator(nullptr);
         }
 
-        // ======================
+        // ============================== //
+        // Methods 
+        // ============================== //
 
+        /// @brief Constructs an empty SkipList.
         SkipList();
-        ~SkipList() = default;
 
-        // Additive constructors
+        /**
+         * @brief Copy constructor.
+         * @param other The SkipList to copy from.
+         */
         SkipList(const SkipList& other);
+
+        /**
+         * @brief Move constructor.
+         * @param other The SkipList to move from (an rvalue reference).
+         */
         SkipList(SkipList&& other) noexcept;
 
-        // Init checking
-        std::size_t get_current_level() const;
-        std::size_t size() const;
-        bool empty() const;
-
-        // Test requirements
-        std::shared_ptr<Node<T>> get_first_node_at_0() const;
+        /// @brief Destroys the SkipList. Defaulted due to smart pointer usage.
+        ~SkipList() = default;
 
         // Main functionality
+
+        /** 
+         * @brief  Generates a random level for a new node.
+         * @return A randomly generated level for a new node.
+         */
+        std::size_t get_random_level();
+        
+        /**
+         * @brief Returns the current maximum level of the SkipList.
+         * @return The maximum level reached by any node in the list.
+         */
+        std::size_t get_current_level() const;
+
+        /**
+         * @brief Returns a shared pointer to the first node at level 0.
+         * @details This is primarily for testing.
+         * @return A shared pointer to the first actual data node at the base level.
+         */
+        std::shared_ptr<Node<T>> get_first_node_at_0() const;
+
+        /**
+         * @brief Returns the number of elements in the SkipList.
+         * @return The total number of elements.
+         */
+        std::size_t size() const;
+
+        /**
+         * @brief Checks if the SkipList is empty.
+         * @return True if the SkipList contains no elements, false otherwise.
+         */
+        bool empty() const;
+
+        /**
+         * @brief Inserts a new element into the SkipList.
+         * @details If the value already exists, no insertion occurs.
+         * @param value The value to insert.
+         */
         void insert(const T& value);
+
+        /**
+         * @brief Checks if the SkipList contains a specific value.
+         * @param value The value to search for.
+         * @return True if the value is found, false otherwise.
+         */
         bool contains(const T& value) const;
+
+        /**
+         * @brief Erases an element from the SkipList.
+         * @param value The value to erase.
+         * @return True if the element was found and erased, false otherwise.
+         */
         bool erase(const T& value);
 
         // operators
+        /**
+         * @brief Equality comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if the SkipLists are equal, false otherwise.
+         */
         bool operator==(const SkipList<T>& other) const;
+
+        /**
+         * @brief Inequality comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if the SkipLists are not equal, false otherwise.
+         */
         bool operator!=(const SkipList<T>& other) const;
-        SkipList& operator=(const SkipList& other); // copy assignment operator
-        SkipList& operator=(SkipList&& other) noexcept; // move assignment operator
+
+        /**
+         * @brief Copy assignment operator.
+         * @param other The SkipList to copy from.
+         * @return A reference to this SkipList after assignment.
+         */
+        SkipList& operator=(const SkipList& other); 
+
+        /**
+         * @brief Move assignment operator.
+         * @param other The SkipList to move from (an rvalue reference).
+         * @return A reference to this SkipList after assignment.
+         */
+        SkipList& operator=(SkipList&& other) noexcept;
+
+        /**
+         * @brief Less than comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if this SkipList is lexicographically less than the other, false otherwise.
+         */
         bool operator<(const SkipList& other) const;
+
+        /**
+         * @brief Greater than comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if this SkipList is lexicographically greater than the other, false otherwise.
+         */
         bool operator>(const SkipList& other) const;
+
+        /**
+         * @brief Less than or equal to comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if this SkipList is lexicographically less than or equal to the other, false otherwise.
+         */
         bool operator<=(const SkipList& other) const;
+        
+        /**
+         * @brief Greater than or equal to comparison operator.
+         * @param other The SkipList to compare with.
+         * @return True if this SkipList is lexicographically greater than or equal to the other, false otherwise.
+         */
         bool operator>=(const SkipList& other) const;
 };
 
@@ -245,42 +487,14 @@ SkipList<T>::SkipList(SkipList&& other) noexcept :
     other.num_elements = 0;
 }
 
-/* Node is now contains shared_ptr so destructor may be default. Keep it if needed later.
-template <typename T>
-SkipList<T>::~SkipList()
-{
-    for (std::size_t i = 0; i < num_elements; ++i)
-    {
-        Node<T>* current = head->next[0];
-
-        while (current != nullptr) 
-        {
-            Node<T>* next_node = current->next[0]; 
-            delete current;                               
-            current = next_node;                         
-        }
-    }
-}
-*/
 
 template <typename T>
 std::size_t SkipList<T>::get_random_level()
 {   
-    /*
     std::size_t level = 1;
     while (dis(rng) < 0.25 && level < MAX_LEVEL)
     {
         ++level;
-    }
-    return level;
-    */
-
-    // fixed for testing
-    static std::mt19937 fixed_gen(0); 
-    std::uniform_int_distribution<> distrib(0, MAX_LEVEL);
-    std::size_t level = 0;
-    while (distrib(fixed_gen) % 2 == 0 && level < MAX_LEVEL) {
-        level++;
     }
     return level;
 }
@@ -313,7 +527,7 @@ void SkipList<T>::insert(const T& value)
     Node<T>* current = head.get();
 
     // Step 1 and 2 
-    for (std::size_t i = current_level + 1; i-- > 0;) // Идем от current_level до 0 включительно
+    for (std::size_t i = current_level + 1; i-- > 0;) 
     {
         while (current->next[i] != nullptr && current->next[i]->getValue() < value)
         {
@@ -353,26 +567,11 @@ void SkipList<T>::insert(const T& value)
     }
 
     num_elements++;
-
-    // DEBUG
-    /*
-    std::cout << "DEBUG: Inserted value: " << value << ". Current list on level 0: ";
-    std::shared_ptr<Node<T>> debug_current = head->next[0];
-    while (debug_current != nullptr) 
-    {
-        std::cout << debug_current->getValue() << " ";
-        debug_current = debug_current->next[0];
-    }
-    std::cout << std::endl;
-    std::cout << "DEBUG: current_level after insert: " << current_level << std::endl;
-    */
 }
 
 template <typename T>
 bool SkipList<T>::contains(const T& value) const
 {
-    // std::cout << "DEBUG: contains(" << value << ") called. current_level: " << current_level << std::endl;
-
     Node<T>* current = head.get();
 
     for (std::size_t level = current_level + 1; level-- > 0;)
@@ -384,28 +583,6 @@ bool SkipList<T>::contains(const T& value) const
     }
 
     bool found = (current->next[0] != nullptr && current->next[0]->getValue() == value);
-
-    /*
-    if (found)
-    {
-        std::cout << "DEBUG: contains: found value" << current->next[0]->getValue() << std::endl;
-    }
-
-    else 
-    {
-        std::cout << "DEBUG: contains: Value " << value << " not found." << std::endl;
-
-        if (current != head.get()) 
-        {
-            std::cout << "DEBUG: contains: After loop, current value: " << current->getValue() << std::endl;
-        } 
-
-        else 
-        {
-            std::cout << "DEBUG: contains: After loop, current value: [HEAD_NODE]" << std::endl;
-        }
-    }
-    */
 
     return found;
 }

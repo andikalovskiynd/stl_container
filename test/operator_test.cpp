@@ -1,7 +1,22 @@
+/**
+ * @file operator_test.cpp
+ * @brief Tests for overloaded operators of the SkipList class, including equality, copy assignment, and move assignment.
+ * @details This file contains unit tests using the Google Test framework to ensure the correct behavior
+ */
+
 #include "gtest/gtest.h"
 #include "../include/skip_list.h"
 
+/// @brief Constant for number 2.
+const std::size_t TWO = 2;
+
+/// @brief Constant for number 3.
+const std::size_t THREE = 3;
+
 // EQUALITY
+/**
+ * @brief Test for the equality operator with two empty SkipLists.
+ */
 TEST(SkipListOperatorTest, Equality_EmptyList)
 {
     SkipList<int> list;
@@ -10,6 +25,9 @@ TEST(SkipListOperatorTest, Equality_EmptyList)
     EXPECT_TRUE(list == other_list);
 }
 
+/**
+ * @brief Test for the equality operator with two identical SkipLists.
+ */
 TEST(SkipListOperatorTest, Equality_IdenticalLists) 
 {
     SkipList<int> list;
@@ -25,6 +43,9 @@ TEST(SkipListOperatorTest, Equality_IdenticalLists)
     EXPECT_TRUE(list == other_list);
 }
 
+/**
+ * @brief Test for the equality operator with SkipLists of different sizes.
+ */
 TEST(SkipListOperatorTest, Equality_DifferentSizes) 
 {
     SkipList<int> list;
@@ -40,6 +61,9 @@ TEST(SkipListOperatorTest, Equality_DifferentSizes)
     EXPECT_FALSE(list == other_list);
 }
 
+/**
+ * @brief Test for the equality operator with SkipLists containing different elements.
+ */
 TEST(SkipListOperatorTest, Equality_DifferentElements) 
 {
     SkipList<int> list;
@@ -56,6 +80,9 @@ TEST(SkipListOperatorTest, Equality_DifferentElements)
     EXPECT_FALSE(list == other_list);
 }
 
+/**
+ * @brief Test for the equality operator with SkipLists having elements inserted in a different order.
+ */
 TEST(SkipListOperatorTest, Equality_DifferentOrder) 
 {
     SkipList<int> list;
@@ -72,6 +99,9 @@ TEST(SkipListOperatorTest, Equality_DifferentOrder)
 }
 
 // COPY ASSIGNMENT
+/**
+ * @brief Test for the copy assignment operator when assigning from an empty SkipList.
+ */
 TEST(SkipListOperatorTest, CopyAssignment_FromEmptyList)
 {
     SkipList<int> list;
@@ -87,6 +117,9 @@ TEST(SkipListOperatorTest, CopyAssignment_FromEmptyList)
     EXPECT_TRUE(list == empty_list);
 }
 
+/**
+ * @brief Test for the copy assignment operator when assigning to an empty SkipList.
+ */
 TEST(SkipListOperatorTest, CopyAssignment_ToEmptyList)
 {
     SkipList<int> list;
@@ -94,14 +127,17 @@ TEST(SkipListOperatorTest, CopyAssignment_ToEmptyList)
     other_list.insert(100);
     other_list.insert(200);
 
-    list = other_list; // Присваиваем непустой список пустому
+    list = other_list; 
 
-    EXPECT_EQ(list.size(), 2);
+    EXPECT_EQ(list.size(), TWO);
     EXPECT_TRUE(list.contains(100));
     EXPECT_TRUE(list.contains(200));
     EXPECT_TRUE(list == other_list);
 }
 
+/**
+ * @brief Test for the copy assignment operator when overwriting an existing SkipList.
+ */
 TEST(SkipListOperatorTest, CopyAssignment_Overwrite)
 {
     SkipList<int> list;
@@ -113,15 +149,18 @@ TEST(SkipListOperatorTest, CopyAssignment_Overwrite)
     other_list.insert(20);
     other_list.insert(30);
 
-    list = other_list; // Присваиваем один непустой список другому
+    list = other_list; 
 
-    EXPECT_EQ(list.size(), 3);
+    EXPECT_EQ(list.size(), THREE);
     EXPECT_TRUE(list.contains(10));
     EXPECT_TRUE(list.contains(20));
     EXPECT_TRUE(list.contains(30));
     EXPECT_TRUE(list == other_list);
 }
 
+/**
+ * @brief Test for the copy assignment operator followed by changes to the original list.
+ */
 TEST(SkipListOperatorTest, CopyAssignment_CopyThenChange)
 {
     SkipList<int> list;
@@ -137,13 +176,13 @@ TEST(SkipListOperatorTest, CopyAssignment_CopyThenChange)
     other_list.insert(50);
     other_list.erase(200);
 
-    EXPECT_EQ(other_list.size(), 2);
+    EXPECT_EQ(other_list.size(), TWO);
     EXPECT_TRUE(other_list.contains(100));
     EXPECT_TRUE(other_list.contains(50));
     EXPECT_FALSE(other_list.contains(200));
 
     // list must not change
-    EXPECT_EQ(list.size(), 2);
+    EXPECT_EQ(list.size(), TWO);
     EXPECT_TRUE(list.contains(100));
     EXPECT_TRUE(list.contains(200));
     EXPECT_FALSE(list.contains(50));
@@ -151,6 +190,9 @@ TEST(SkipListOperatorTest, CopyAssignment_CopyThenChange)
     EXPECT_FALSE(list == other_list);
 }
 
+/**
+ * @brief Test for the copy assignment operator with self-assignment.
+ */
 TEST(SkipListOperatorTest, CopyAssignment_CopyToSelf)
 {
     SkipList<int> list;
@@ -169,6 +211,9 @@ TEST(SkipListOperatorTest, CopyAssignment_CopyToSelf)
 }
 
 // MOVE 
+/**
+ * @brief Test for the move assignment operator when assigning to an empty SkipList.
+ */
 TEST(SkipListOperatorTest, MoveAssignment_ToEmptyList)
 {
     SkipList<int> list;
@@ -179,13 +224,16 @@ TEST(SkipListOperatorTest, MoveAssignment_ToEmptyList)
     // DELIBERATE CHOICE FOR TEST
     list = std::move(original_list);
 
-    EXPECT_EQ(list.size(), 2);
+    EXPECT_EQ(list.size(), TWO);
     EXPECT_TRUE(list.contains(10));
     EXPECT_TRUE(list.contains(20));
 
     EXPECT_TRUE(original_list.empty());
 }
 
+/**
+ * @brief Test for the move assignment operator when overwriting an existing SkipList.
+ */
 TEST(SkipListOperatorTest, MoveAssignment_Overwrite)
 {
     SkipList<int> list;
@@ -200,7 +248,7 @@ TEST(SkipListOperatorTest, MoveAssignment_Overwrite)
     // DELIBERATE CHOICE FOR TEST
     list = std::move(original_list); 
 
-    EXPECT_EQ(list.size(), 3);
+    EXPECT_EQ(list.size(), THREE);
     EXPECT_TRUE(list.contains(10));
     EXPECT_TRUE(list.contains(20));
     EXPECT_TRUE(list.contains(30));
@@ -208,6 +256,9 @@ TEST(SkipListOperatorTest, MoveAssignment_Overwrite)
     EXPECT_TRUE(original_list.empty()); 
 }
 
+/**
+ * @brief Test for the move assignment operator with self-assignment.
+ */
 TEST(SkipListOperatorTest, MoveAssignment_Self)
 {
     SkipList<int> list;

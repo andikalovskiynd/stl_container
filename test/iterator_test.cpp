@@ -1,11 +1,18 @@
+/**
+ * @file iterator_test.cpp
+ * @brief Tests for iterators of the SkipList class.
+ * @details While tests are performed with 'int', the principles apply to other data types
+ * due to the templated nature of SkipList.
+ */
+
 #include "gtest/gtest.h"
 
 #include "../include/node.h"
 #include "../include/skip_list.h"
 
-// There is no actual sense to make tests for every type of data that we test
-// so we make tests for int and suppose that it will work for other types
-
+/**
+ * @brief Test for iterators on an empty SkipList.
+ */
 TEST(SkipListIteratorTest, Iterators_EmptyList) 
 {
     SkipList<int> list;
@@ -17,6 +24,9 @@ TEST(SkipListIteratorTest, Iterators_EmptyList)
     ASSERT_THROW(*list.end(), std::out_of_range);
 }
 
+/**
+ * @brief Test for iterators with a SkipList containing a single element.
+ */
 TEST(SkipListIteratorTest, Iterator_SingleElement)
 {
     SkipList<int> list;
@@ -31,6 +41,9 @@ TEST(SkipListIteratorTest, Iterator_SingleElement)
     ASSERT_TRUE(it == list.end());
 }
 
+/**
+ * @brief Test for const iterators with a SkipList containing a single element.
+ */
 TEST(SkipListIteratorTest, Iterator_SingleElement_Const)
 {
     SkipList<int> list;
@@ -44,6 +57,9 @@ TEST(SkipListIteratorTest, Iterator_SingleElement_Const)
     ASSERT_TRUE(cit == const_list.cend());
 }
 
+/**
+ * @brief Test for basic traversal of a SkipList using iterators (range-based for, prefix increment).
+ */
 TEST(SkipListIteratorTest, BasicTraversal) 
 {
     SkipList<int> list;
@@ -81,6 +97,9 @@ TEST(SkipListIteratorTest, BasicTraversal)
     ASSERT_EQ(expected, actual_elements);
 }
 
+/**
+ * @brief Test for the arrow operator of the iterator.
+ */
 TEST(SkipListIteratorTest, ArrowOperator) 
 {
     SkipList<int> list;
@@ -90,6 +109,9 @@ TEST(SkipListIteratorTest, ArrowOperator)
     EXPECT_EQ(*it, *it.operator->());
 }
 
+/**
+ * @brief Test for the postfix increment operator.
+ */
 TEST(SkipListIteratorTest, PostfixIncrement) 
 {
     SkipList<int> list;
@@ -106,6 +128,9 @@ TEST(SkipListIteratorTest, PostfixIncrement)
     ASSERT_TRUE(it == list.end());
 }
 
+/**
+ * @brief Test for integration with std::find algorithm.
+ */
 TEST(SkipListIteratorTest, StdFind) 
 {
     SkipList<int> list;
@@ -121,6 +146,9 @@ TEST(SkipListIteratorTest, StdFind)
     ASSERT_EQ(not_found_it, list.end());
 }
 
+/**
+ * @brief Test for constructing a const_iterator from a regular iterator.
+ */
 TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator) 
 {
     SkipList<int> list;
@@ -141,6 +169,9 @@ TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator)
     EXPECT_EQ(*cit, 20);
 }
 
+/**
+ * @brief Test for comparison between iterator and const_iterator.
+ */
 TEST(SkipListIteratorTest, IteratorConstIteratorComparison) 
 {
     SkipList<int> list;
