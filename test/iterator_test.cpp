@@ -13,8 +13,7 @@
 /**
  * @brief Test for iterators on an empty SkipList.
  */
-TEST(SkipListIteratorTest, Iterators_EmptyList) 
-{
+TEST(SkipListIteratorTest, Iterators_EmptyList) {
     SkipList<int> list;
 
     ASSERT_TRUE(list.begin() == list.end());
@@ -27,8 +26,7 @@ TEST(SkipListIteratorTest, Iterators_EmptyList)
 /**
  * @brief Test for iterators with a SkipList containing a single element.
  */
-TEST(SkipListIteratorTest, Iterator_SingleElement)
-{
+TEST(SkipListIteratorTest, Iterator_SingleElement) {
     SkipList<int> list;
     list.insert(11);
 
@@ -44,8 +42,7 @@ TEST(SkipListIteratorTest, Iterator_SingleElement)
 /**
  * @brief Test for const iterators with a SkipList containing a single element.
  */
-TEST(SkipListIteratorTest, Iterator_SingleElement_Const)
-{
+TEST(SkipListIteratorTest, Iterator_SingleElement_Const) {
     SkipList<int> list;
     list.insert(11);
 
@@ -60,8 +57,7 @@ TEST(SkipListIteratorTest, Iterator_SingleElement_Const)
 /**
  * @brief Test for basic traversal of a SkipList using iterators (range-based for, prefix increment).
  */
-TEST(SkipListIteratorTest, BasicTraversal) 
-{
+TEST(SkipListIteratorTest, BasicTraversal) {
     SkipList<int> list;
     list.insert(10);
     list.insert(20);
@@ -72,8 +68,7 @@ TEST(SkipListIteratorTest, BasicTraversal)
     std::vector<int> expected = {5, 10, 15, 20, 25};
     std::vector<int> actual_elements;
 
-    for (const auto& val : list) 
-    { 
+    for (const auto& val : list) {
         actual_elements.push_back(val);
     }
     ASSERT_EQ(expected, actual_elements);
@@ -81,8 +76,7 @@ TEST(SkipListIteratorTest, BasicTraversal)
 
     actual_elements.clear();
 
-    for (auto it = list.begin(); it != list.end(); ++it) 
-    { 
+    for (auto it = list.begin(); it != list.end(); ++it) {
         actual_elements.push_back(*it);
     }
     ASSERT_EQ(expected, actual_elements);
@@ -90,8 +84,7 @@ TEST(SkipListIteratorTest, BasicTraversal)
 
     actual_elements.clear();
 
-    for (auto it = list.cbegin(); it != list.cend(); ++it) 
-    { 
+    for (auto it = list.cbegin(); it != list.cend(); ++it) {
         actual_elements.push_back(*it);
     }
     ASSERT_EQ(expected, actual_elements);
@@ -100,8 +93,7 @@ TEST(SkipListIteratorTest, BasicTraversal)
 /**
  * @brief Test for the arrow operator of the iterator.
  */
-TEST(SkipListIteratorTest, ArrowOperator) 
-{
+TEST(SkipListIteratorTest, ArrowOperator) {
     SkipList<int> list;
     list.insert(10);
 
@@ -112,27 +104,25 @@ TEST(SkipListIteratorTest, ArrowOperator)
 /**
  * @brief Test for the postfix increment operator.
  */
-TEST(SkipListIteratorTest, PostfixIncrement) 
-{
+TEST(SkipListIteratorTest, PostfixIncrement) {
     SkipList<int> list;
     list.insert(10);
     list.insert(20);
 
-    auto it = list.begin(); 
-    auto old_it = it++; 
+    auto it = list.begin();
+    auto old_it = it++;
 
     EXPECT_EQ(*old_it, 10);
     EXPECT_EQ(*it, 20);
-    
-    ++it; 
+
+    ++it;
     ASSERT_TRUE(it == list.end());
 }
 
 /**
  * @brief Test for integration with std::find algorithm.
  */
-TEST(SkipListIteratorTest, StdFind) 
-{
+TEST(SkipListIteratorTest, StdFind) {
     SkipList<int> list;
     list.insert(10);
     list.insert(20);
@@ -149,8 +139,7 @@ TEST(SkipListIteratorTest, StdFind)
 /**
  * @brief Test for constructing a const_iterator from a regular iterator.
  */
-TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator) 
-{
+TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator) {
     SkipList<int> list;
     list.insert(10);
     list.insert(20);
@@ -159,7 +148,7 @@ TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator)
     EXPECT_EQ(*it, 10);
 
     SkipList<int>::const_iterator cit = it;
-    EXPECT_EQ(*cit, 10); 
+    EXPECT_EQ(*cit, 10);
 
     ++it;
     EXPECT_EQ(*it, 20);
@@ -172,8 +161,7 @@ TEST(SkipListIteratorTest, ConstIterator_ConstructionFromIterator)
 /**
  * @brief Test for comparison between iterator and const_iterator.
  */
-TEST(SkipListIteratorTest, IteratorConstIteratorComparison) 
-{
+TEST(SkipListIteratorTest, IteratorConstIteratorComparison) {
     SkipList<int> list;
     list.insert(10);
     list.insert(20);
@@ -186,7 +174,7 @@ TEST(SkipListIteratorTest, IteratorConstIteratorComparison)
     SkipList<int>::const_iterator cit_20 = ++SkipList<int>::const_iterator(list.cbegin());
 
     ASSERT_TRUE(it_10 == cit_10);
-    ASSERT_TRUE(cit_10 == it_10); 
+    ASSERT_TRUE(cit_10 == it_10);
 
     ASSERT_TRUE(it_10 != cit_20);
     ASSERT_TRUE(cit_20 != it_10);
