@@ -123,3 +123,132 @@ TEST_F(SkipListDoubleTest, Contains_FewNotExisting)
     EXPECT_FALSE(double_list.contains(10.444));
     EXPECT_FALSE(double_list.contains(20.444));
 }
+
+// Lexicographic 
+// <
+TEST_F(SkipListDoubleTest, Operator_LessThan_EmptyVsNotEmpty)
+{
+    SkipList<double> other_list;
+    other_list.insert(10.5); 
+    EXPECT_TRUE(double_list < other_list);
+    EXPECT_FALSE(other_list < double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_LessThan_TwoDifferent)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+    other_list.insert(30.0);
+
+    EXPECT_TRUE(double_list < other_list);
+    EXPECT_FALSE(other_list < double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_LessThan_LessVsGreater)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+    double_list.insert(30.0);
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+    other_list.insert(25.5); 
+
+    EXPECT_TRUE(other_list < double_list); 
+    EXPECT_FALSE(double_list < other_list);
+}
+
+// >
+TEST_F(SkipListDoubleTest, Operator_GreaterThan_EmptyVsNotEmpty)
+{
+    SkipList<double> other_list;
+    double_list.insert(10.5);
+    EXPECT_TRUE(double_list > other_list);
+    EXPECT_FALSE(other_list > double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_GreaterThan_TwoDifferent)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+    double_list.insert(30.0);
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+
+    EXPECT_TRUE(double_list > other_list);
+    EXPECT_FALSE(other_list > double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_GreaterThan_LessVsGreater)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+    double_list.insert(30.0); 
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+    other_list.insert(25.5); 
+
+    EXPECT_TRUE(double_list > other_list);
+    EXPECT_FALSE(other_list > double_list);
+}
+
+// <=
+TEST_F(SkipListDoubleTest, Operator_LessOrEqual_Identical)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+
+    SkipList<double> other_list(double_list); 
+
+    EXPECT_TRUE(double_list <= other_list);
+    EXPECT_TRUE(other_list <= double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_LessOrEqual_LessVsGreater)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+    other_list.insert(30.0);
+
+    EXPECT_TRUE(double_list <= other_list);
+    EXPECT_FALSE(other_list <= double_list);
+}
+
+// >=
+TEST_F(SkipListDoubleTest, Operator_GreaterOrEqual_Identical)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+
+    SkipList<double> other_list(double_list);
+
+    EXPECT_TRUE(double_list >= other_list);
+    EXPECT_TRUE(other_list >= double_list);
+}
+
+TEST_F(SkipListDoubleTest, Operator_GreaterOrEqual_LessVsGreater)
+{
+    double_list.insert(10.0);
+    double_list.insert(20.0);
+    double_list.insert(30.0);
+
+    SkipList<double> other_list;
+    other_list.insert(10.0);
+    other_list.insert(20.0);
+    
+    EXPECT_TRUE(double_list >= other_list);
+    EXPECT_FALSE(other_list >= double_list);
+}

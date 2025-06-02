@@ -160,3 +160,136 @@ TEST_F(SkipListIntTest, Erase_EmptyList)
     EXPECT_TRUE(check_level_0({}));
     EXPECT_EQ(0, int_list.size());
 }
+
+// Lexicographic operators
+// <
+TEST_F(SkipListIntTest, Operator_LessThan_EmptyVsNotEmpty) 
+{   
+    SkipList<int> other_list;
+
+    other_list.insert(10);
+
+    EXPECT_TRUE(int_list < other_list); 
+    EXPECT_FALSE(other_list < int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_LessThan_TwoDifferent)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+    other_list.insert(30);
+
+    EXPECT_TRUE(int_list < other_list); 
+    EXPECT_FALSE(other_list < int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_LessThan_LessVsGreater)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+    int_list.insert(30);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+    other_list.insert(25); 
+
+    EXPECT_TRUE(other_list < int_list); 
+    EXPECT_FALSE(int_list < other_list);
+}
+
+// >
+TEST_F(SkipListIntTest, Operator_GreaterThan_EmptyVsNotEmpty)
+{
+    SkipList<int> other_list;
+
+    int_list.insert(10);
+
+    EXPECT_TRUE(int_list > other_list); 
+    EXPECT_FALSE(other_list > int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_GreaterThan_TwoDifferent)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+    int_list.insert(30);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+
+    EXPECT_TRUE(int_list > other_list); 
+    EXPECT_FALSE(other_list > int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_GreaterThan_LessVsGreater)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+    int_list.insert(30);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+    other_list.insert(25);
+
+    EXPECT_TRUE(int_list > other_list);
+    EXPECT_FALSE(other_list > int_list);
+}
+
+// <=
+TEST_F(SkipListIntTest, Operator_LessOrEqual_Identical)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    SkipList<int> other_list(int_list);
+
+    EXPECT_TRUE(int_list <= other_list);
+    EXPECT_TRUE(other_list <= int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_LessOrEqual_LessVsGreater)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+    other_list.insert(30);
+
+    EXPECT_TRUE(int_list <= other_list);
+    EXPECT_FALSE(other_list <= int_list);
+}
+
+// >=
+TEST_F(SkipListIntTest, Operator_GreaterOrEqual_Identical)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+
+    SkipList<int> other_list(int_list);
+
+    EXPECT_TRUE(int_list >= other_list);
+    EXPECT_TRUE(other_list >= int_list);
+}
+
+TEST_F(SkipListIntTest, Operator_GreaterOrEqual_LessVsGreater)
+{
+    int_list.insert(10);
+    int_list.insert(20);
+    int_list.insert(30);
+
+    SkipList<int> other_list;
+    other_list.insert(10);
+    other_list.insert(20);
+    
+    EXPECT_TRUE(int_list >= other_list);
+    EXPECT_FALSE(other_list >= int_list);
+}

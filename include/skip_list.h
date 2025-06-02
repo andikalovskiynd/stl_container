@@ -188,6 +188,10 @@ class SkipList
         SkipList();
         ~SkipList() = default;
 
+        // Additive constructors
+        SkipList(const SkipList& other);
+        SkipList(SkipList&& other) noexcept;
+
         // Init checking
         std::size_t get_current_level() const;
         std::size_t size() const;
@@ -200,6 +204,16 @@ class SkipList
         void insert(const T& value);
         bool contains(const T& value) const;
         bool erase(const T& value);
+
+        // operators
+        bool operator==(const SkipList<T>& other) const;
+        bool operator!=(const SkipList<T>& other) const;
+        SkipList& operator=(const SkipList& other); // copy assignment operator
+        SkipList& operator=(SkipList&& other) noexcept; // move assignment operator
+        bool operator<(const SkipList& other) const;
+        bool operator>(const SkipList& other) const;
+        bool operator<=(const SkipList& other) const;
+        bool operator>=(const SkipList& other) const;
 };
 
 template <typename T>
@@ -208,6 +222,27 @@ SkipList<T>::SkipList() : head(std::make_unique<Node<T>>(MAX_LEVEL)), current_le
     std::random_device rd;
     rng.seed(rd());
     dis = std::uniform_real_distribution<>(0.0, 1.0);
+}
+
+template <typename T>
+SkipList<T>::SkipList(const SkipList& other) : SkipList() 
+{
+    for (const T& value : other) 
+    {
+        insert(value);
+    }
+}
+
+template <typename T>
+SkipList<T>::SkipList(SkipList&& other) noexcept : 
+    head(std::move(other.head)), 
+    current_level(other.current_level), num_elements(other.num_elements),
+    rng(std::move(other.rng)), 
+    dis(std::move(other.dis))  
+{
+    other.head = std::make_unique<Node<T>>(MAX_LEVEL);
+    other.current_level = 0;
+    other.num_elements = 0;
 }
 
 /* Node is now contains shared_ptr so destructor may be default. Keep it if needed later.
@@ -431,5 +466,100 @@ bool SkipList<T>::empty() const
     return num_elements == 0;
 }
 
+// operators
+template <typename T>
+SkipList<T>& SkipList<T>::operator=(SkipList&& other) noexcept 
+{
+    if (this != &other) 
+    {
+        head.reset(); 
+
+        head = std::move(other.head);
+        current_level = other.current_level;
+        num_elements = other.num_elements;
+        rng = std::move(other.rng);
+        dis = std::move(other.dis);
+
+        other.head = std::make_unique<Node<T>>(MAX_LEVEL);
+        other.current_level = 0;
+        other.num_elements = 0;
+    }
+    return *this;
+}
+
+template <typename T>
+SkipList<T>& SkipList<T>::operator=(const SkipList& other) 
+{
+    if (this != &other) 
+    { 
+        SkipList temp(other); 
+        std::swap(head, temp.head);
+        std::swap(current_level, temp.current_level);
+        std::swap(num_elements, temp.num_elements);
+    }
+    return *this;
+}
+
+template <typename T>
+bool SkipList<T>::operator==(const SkipList& other) const 
+{
+    if (num_elements != other.num_elements) 
+    {
+        return false;
+    }
+
+    auto it1 = cbegin();
+    auto it2 = other.cbegin();
+
+    for (; it1 != cend() && it2 != other.cend(); ++it1, ++it2) 
+    {
+        if (!(*it1 == *it2)) 
+        { 
+            return false;
+        }
+    }
+    return true;
+}
+
+template <typename T>
+bool SkipList<T>::operator<(const SkipList& other) const 
+{
+    auto it1 = cbegin();
+    auto end1 = cend();
+    auto it2 = other.cbegin();
+    auto end2 = other.cend();
+
+    for (; it1 != end1 && it2 != end2; ++it1, ++it2) 
+    {
+        if (*it1 < *it2) 
+        { 
+            return true;
+        }
+        if (*it2 < *it1) 
+        { 
+            return false;
+        }
+    }
+
+    return (it1 == end1 && it2 != end2);
+}
+
+template <typename T>
+bool SkipList<T>::operator>(const SkipList& other) const 
+{
+    return other < *this; 
+}
+
+template <typename T>
+bool SkipList<T>::operator<=(const SkipList& other) const 
+{
+    return !(*this > other); 
+}
+
+template <typename T>
+bool SkipList<T>::operator>=(const SkipList& other) const 
+{
+    return !(*this < other); 
+}
 
 #endif
