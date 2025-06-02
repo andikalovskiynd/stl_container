@@ -1,6 +1,7 @@
 *.o
 *.obj
 *.out
+*.orig
 *.app
 *.dll
 *.lib
