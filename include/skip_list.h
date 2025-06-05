@@ -10,6 +10,7 @@
 #include <memory>
 #include <random>
 #include <iostream>
+#include <algorithm>
 
 #include "node.h"
 

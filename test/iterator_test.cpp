@@ -5,6 +5,8 @@
  * due to the templated nature of SkipList.
  */
 
+#include <algorithm>
+
 #include "gtest/gtest.h"
 
 #include "../include/node.h"
